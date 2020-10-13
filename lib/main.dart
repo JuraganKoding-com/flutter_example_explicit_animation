@@ -26,13 +26,29 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
+  final Tween<double> turnsTween = Tween<double>(begin: 1, end: 3);
+  AnimationController _controller;
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  @override
+  void initState() {
+    super.initState();
+
+    this._controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    );
+  }
+
+  void _startAnimation() {
+    if (this._controller.status == AnimationStatus.completed) {
+      this._controller.reverse();
+    }
+
+    if (this._controller.status == AnimationStatus.dismissed) {
+      this._controller.forward();
+    }
   }
 
   @override
@@ -42,23 +58,15 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+        child: RotationTransition(
+          child: Image.asset("assets/wheel_wagon.webp"),
+          turns: turnsTween.animate(this._controller),
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: _startAnimation,
         tooltip: 'Increment',
-        child: Icon(Icons.add),
+        child: Icon(Icons.play_arrow),
       ),
     );
   }
